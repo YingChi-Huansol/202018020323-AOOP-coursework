@@ -1,0 +1,204 @@
+@startuml
+class CustomClass.RoundedButton {
+- Color currentBackgroundColor
+- Color hoverBackgroundColor
+- Color pressedBackgroundColor
++ <<Create>> RoundedButton(String)
+# void paintComponent(Graphics)
+# void paintBorder(Graphics)
++ boolean contains(int,int)
++ void setBackground(Color)
++ void setHoverBackgroundColor(Color)
++ void setPressedBackgroundColor(Color)
+}
+
+
+class CustomClass.RoundedBorderLabel {
+- int radius
++ <<Create>> RoundedBorderLabel(int)
+# void paintComponent(Graphics)
+# void paintBorder(Graphics)
++ Dimension getPreferredSize()
+}
+
+
+class View.NumberleView {
+- INumberleModel model
+- NumberleController controller
+- JFrame frame
+- SpacedJTextField inputTextField
+- JLabel attemptsLabel
+- JLabel targetLabel
+- JPanel guessPanel
+- RoundedButton newGameButton
+- HashMap<Character,RoundedButton> buttonMap
+- JCheckBox verifyEquationCheckBox
+- JCheckBox displayEquationCheckBox
+- JCheckBox randomEqualityCheckBox
+- JLabel verifySign
+- JLabel displaySign
+- JLabel randomSign
++ <<Create>> NumberleView(INumberleModel,NumberleController)
+- void initializeFrame()
++ void update(java.util.Observable,Object)
+- void updateFlags()
+- void updateButtonColors()
+- void showGameSettingsDialog()
+- void showGameOverDialog()
++ void showInvalidInputMessage(int)
+- void clearGameView()
+}
+
+
+interface Model.Interface.INumberleModel {
+~ {static} int MAX_ATTEMPTS
+~ void initialize()
+~ int processInput(String)
+~ boolean isGameOver()
+~ boolean isGameWon()
+~ String getTargetNumber()
+~ int getRemainingAttempts()
+~ void startNewGame()
+~ ArrayList<String> getGuessList()
+~ ArrayList<int[]> getCompareList()
+~ boolean getDisplayEquation()
+~ boolean getVerifyEquation()
+~ boolean getRandomEquality()
+~ ArrayList[] getClassList()
+~ void setVerifyEquation(boolean)
+~ void setDisplayEquation(boolean)
+~ void setRandomEquality(boolean)
+~ void setTarget(String)
+}
+
+
+class CustomClass.EquationGenerator {
+- Random random
+- String bestEquation
++ void generateEquation()
++ String getEquation()
+- char randomOperator()
+- char randomOperator2()
+- char getOppositeOperator(char)
+- int calculateResult(int,int,char)
+- boolean isValidEquation(String)
+- boolean isValidDecomposedEquation(String,int,char)
+- boolean isValidAdditionEquation(String,int,char)
+- boolean isValidModifiedEquation(String)
+}
+
+
+class CLIApp {
++ {static} void main(String[])
+}
+
+class GUIApp {
++ {static} void main(String[])
++ {static} void createAndShowGUI()
+}
+
+class CustomClass.SpacedJTextField {
+- float letterSpacing
++ <<Create>> SpacedJTextField(float)
+# void paintComponent(Graphics)
+}
+
+
+class Controller.NumberleController {
+- INumberleModel model
+- NumberleView view
++ <<Create>> NumberleController(INumberleModel)
++ void setView(NumberleView)
++ void processInput(String)
++ boolean isGameOver()
++ boolean isGameWon()
++ String getTargetWord()
++ int getRemainingAttempts()
++ void startNewGame()
++ boolean getVerifyEquation()
++ boolean getDisplayEquation()
++ boolean getRandomEquality()
++ void setVerifyEquation(boolean)
++ void setDisplayEquation(boolean)
++ void setRandomEquality(boolean)
++ ArrayList<String> getGuessList()
++ ArrayList<int[]> getCompareList()
++ ArrayList<Character>[] getClassList()
+}
+
+
+class Model.NumberleModel {
+- String targetNumber
+- StringBuilder currentGuess
+- ArrayList<String> guessList
+- ArrayList<int[]> compareList
+- ArrayList<Character>[] classList
+- int remainingAttempts
+- boolean gameWon
+- Random rand
+- boolean verifyEquation
+- boolean displayEquation
+- boolean randomEquality
+- EquationGenerator generator
++ void setVerifyEquation(boolean)
++ void setDisplayEquation(boolean)
++ void setRandomEquality(boolean)
++ void initialize()
++ int processInput(String)
+- void showHistory()
+- boolean checkEquation(String)
+- int evaluateExpression(String)
+- int[] compareStrings(String,String)
+- int calculateResult(int,int,char)
++ void setTarget(String)
++ boolean isGameOver()
++ boolean isGameWon()
++ String getTargetNumber()
++ int getRemainingAttempts()
++ void startNewGame()
++ ArrayList<String> getGuessList()
++ ArrayList<int[]> getCompareList()
++ boolean getDisplayEquation()
++ boolean getVerifyEquation()
++ boolean getRandomEquality()
++ String getEquationFromFile()
++ ArrayList[] getClassList()
+}
+
+
+class Model.NumberleModelTest {
+- NumberleModel model
++ void setUp()
++ void testGameWinFlow()
++ void testGameLoseFlow()
++ void testRandomEquationGeneration()
++ void testProcessInvalidInputFormat()
++ void testSetFlags()
+}
+
+
+
+
+CustomClass.JButton <|-- CustomClass.RoundedButton
+CustomClass.JLabel <|-- CustomClass.RoundedBorderLabel
+java.util.Observer <|.. View.NumberleView
+CustomClass.JTextField <|-- CustomClass.SpacedJTextField
+Model.Interface.INumberleModel <|.. Model.NumberleModel
+Model.Observable <|-- Model.NumberleModel
+Model.NumberleModel <--[dashed] Model.NumberleModelTest
+
+CLIApp .down.> Model.NumberleModel : uses
+GUIApp .down.> Model.NumberleModel : uses
+GUIApp .down.> Controller.NumberleController : uses
+GUIApp .down.> View.NumberleView : uses
+
+Model.NumberleModel "1" *-- "1" View.NumberleView : data
+Model.NumberleModel "1" *-- "1" Controller.NumberleController : data
+View.NumberleView "1" o-- "1" Controller.NumberleController : events
+
+Model.NumberleModel "0..1" o-- "0..1" CustomClass.EquationGenerator : data
+View.NumberleView "1" *-- "1..*" CustomClass.RoundedButton : contains
+View.NumberleView "1" *-- "1..*" CustomClass.RoundedBorderLabel : contains
+View.NumberleView "1" *-- "1..*" CustomClass.SpacedJTextField : contains
+
+@enduml
